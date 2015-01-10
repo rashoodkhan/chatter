@@ -12,10 +12,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 //User defined imports
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ChatManagerListener;
+import org.jivesoftware.smack.ChatMessageListener;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
@@ -61,6 +66,24 @@ public class MainActivity extends ActionBarActivity {
                         }
 
                         if (Global.connection.isAuthenticated()) {
+
+                            ChatManager cm = ChatManager.getInstanceFor(Global.connection);
+                            cm.addChatListener(new ChatManagerListener() {
+                                @Override
+                                public void chatCreated(Chat chat, boolean createdLocally) {
+                                    if(!createdLocally) chat.addMessageListener(new ChatMessageListener() {
+                                        @Override
+                                        public void processMessage(Chat chat, Message message) {
+                                            String name = chat.getParticipant();
+                                            String msg = name+" --> "+message.getBody();
+                                            System.out.println(msg);
+
+                                        }
+                                    });
+                                }
+                            });
+
+
                             Intent intent = new Intent("android.intent.action.USERLIST");
                             startActivity(intent);
                         }else {
@@ -109,7 +132,7 @@ public class MainActivity extends ActionBarActivity {
 
     private XMPPTCPConnection getConnection(String username,String password) {
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setUsernameAndPassword(username,password)
+                .setUsernameAndPassword(username, password)
                 .setServiceName("xmpp.yellowmssngr.com") //TODO: ADD AS CONSTANTS
                 .setHost("xmpp.yellowmssngr.com")
                 .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled)
