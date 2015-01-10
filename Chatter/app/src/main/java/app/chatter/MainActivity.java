@@ -26,7 +26,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 
 public class MainActivity extends ActionBarActivity {
-
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +82,11 @@ public class MainActivity extends ActionBarActivity {
     private XMPPTCPConnection getConnection(String username,String password) {
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
                 .setUsernameAndPassword(username,password)
-                .setServiceName("xmpp.yellowmssngr.com") //TODO: ADD AS CONSTANTS
-                .setHost("xmpp.yellowmssngr.com")
+                .setServiceName(Constants.DOMAIN) //TODO: ADD AS CONSTANTS
+                .setHost(Constants.HOST)
                 .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled)
                 .setSocketFactory(SSLSocketFactory.getDefault())
-                .setPort(443)
+                .setPort(Constants.PORT)
                 .build();
 
         return new XMPPTCPConnection(config);
