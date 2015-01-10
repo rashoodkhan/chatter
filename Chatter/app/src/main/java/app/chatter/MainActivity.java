@@ -2,6 +2,7 @@ package app.chatter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -69,20 +70,21 @@ public class MainActivity extends ActionBarActivity {
 
                         System.out.println(Global.connection.isAuthenticated());
                     }
-
-                  private void showToast(){
-                      Context context = getApplicationContext();
-                      CharSequence text = "Invalid Credentials!";
-                      int duration = Toast.LENGTH_SHORT;
-
-                      Toast toast = Toast.makeText(context, text, duration);
-                      toast.show();
-                  }
                 });
-                th.start();
+                //th.start();
+                new ConnectionTask().execute(usr,pwd);
 
             }
         });
+    }
+
+    private void showToast(){
+        Context context = getApplicationContext();
+        CharSequence text = "Invalid Credentials!";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     @Override
@@ -118,5 +120,29 @@ public class MainActivity extends ActionBarActivity {
                 .build();
 
         return new XMPPTCPConnection(config);
+    }
+
+    private class ConnectionTask extends AsyncTask< String, Void, Void > {
+        protected Void doInBackground(String... userDetails) {
+            int count = userDetails.length;
+            String usr=userDetails[0];
+            String pwd=userDetails[1];
+
+            Global.connection = getConnection(usr,pwd);
+
+            return null;
+        }
+
+        protected void onPostExecute() {
+
+            if (Global.connection.isAuthenticated()) {
+                Intent intent = new Intent("android.intent.action.USERLIST");
+                startActivity(intent);
+            }else {
+                showToast();
+            }
+
+            System.out.println(Global.connection.isAuthenticated());
+        }
     }
 }
