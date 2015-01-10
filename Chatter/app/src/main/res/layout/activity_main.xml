@@ -8,8 +8,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="@string/login"
+        android:background="@color/BrightYellow"
         android:id="@+id/buttonLogin"
+        android:textColor="#ffffff"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="177dp" />

@@ -2,6 +2,7 @@ package app.chatter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -30,7 +31,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 
 public class MainActivity extends ActionBarActivity {
-
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,69 +43,23 @@ public class MainActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Username - "+username.getText()+" Password - "+password.getText());
+                Log.showLog("Username - "+username.getText()+" Password - "+password.getText());
                 final String usr = username.getText().toString();
                 final String pwd = password.getText().toString();
-
-                Thread th = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Global.connection = getConnection(usr,pwd);
-                        try {
-                            Global.connection.connect();
-                            Global.connection.login();
-                        } catch (SmackException e) {
-                            e.printStackTrace();
-//                            showToast();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-//                            showToast();
-                        } catch (XMPPException e) {
-                            e.printStackTrace();
-//                            showToast();
-                        }
-
-                        if (Global.connection.isAuthenticated()) {
-
-                            ChatManager cm = ChatManager.getInstanceFor(Global.connection);
-                            cm.addChatListener(new ChatManagerListener() {
-                                @Override
-                                public void chatCreated(Chat chat, boolean createdLocally) {
-                                    if(!createdLocally) chat.addMessageListener(new ChatMessageListener() {
-                                        @Override
-                                        public void processMessage(Chat chat, Message message) {
-                                            String name = chat.getParticipant();
-                                            String msg = name+" --> "+message.getBody();
-                                            System.out.println(msg);
-
-                                        }
-                                    });
-                                }
-                            });
-
-
-                            Intent intent = new Intent("android.intent.action.USERLIST");
-                            startActivity(intent);
-                        }else {
-                            showToast();
-                        }
-
-                        System.out.println(Global.connection.isAuthenticated());
-                    }
-
-                  private void showToast(){
-                      Context context = getApplicationContext();
-                      CharSequence text = "Invalid Credentials!";
-                      int duration = Toast.LENGTH_SHORT;
-
-                      Toast toast = Toast.makeText(context, text, duration);
-                      toast.show();
-                  }
-                });
-                th.start();
+                
+                new ConnectionTask(usr,pwd).execute(usr,pwd);
 
             }
         });
+    }
+
+    private void showToast(){
+        Context context = getApplicationContext();
+        CharSequence text = "Invalid Credentials!";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     @Override
@@ -132,14 +86,63 @@ public class MainActivity extends ActionBarActivity {
 
     private XMPPTCPConnection getConnection(String username,String password) {
         XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-                .setUsernameAndPassword(username, password)
-                .setServiceName("xmpp.yellowmssngr.com") //TODO: ADD AS CONSTANTS
-                .setHost("xmpp.yellowmssngr.com")
+                .setUsernameAndPassword(username,password)
+                .setServiceName(Constants.DOMAIN) //TODO: ADD AS CONSTANTS
+                .setHost(Constants.HOST)
                 .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled)
                 .setSocketFactory(SSLSocketFactory.getDefault())
-                .setPort(443)
+                .setPort(Constants.PORT)
                 .build();
 
         return new XMPPTCPConnection(config);
+    }
+
+    private class ConnectionTask extends AsyncTask< String, Void, Void > {
+
+        private String usr;
+        private  String pwd;
+
+        ConnectionTask(String usr, String pwd)
+        {
+            this.usr=usr;
+            this.pwd=pwd;
+        }
+
+        @Override
+        protected Void doInBackground(String... param) {
+
+            Global.connection = getConnection(usr,pwd);
+            Log.showLog("usr:"+usr+" pwd:"+pwd+" doInBackground() exiting");
+
+            try {
+                Global.connection.connect();
+                Global.connection.login();
+            } catch (SmackException e) {
+                e.printStackTrace();
+                showToast();
+            } catch (IOException e) {
+                e.printStackTrace();
+                showToast();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+                showToast();
+            }
+            if (Global.connection.isAuthenticated()) {
+                Intent intent = new Intent("android.intent.action.USERLIST");
+                startActivity(intent);
+            }else {
+                showToast();
+            }
+
+            System.out.println(Global.connection.isAuthenticated());
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+
+            Log.showLog("onPostExecute()");
+        }
     }
 }
