@@ -1,5 +1,6 @@
 package app.chatter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class MainActivity extends ActionBarActivity {
 
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,20 +45,39 @@ public class MainActivity extends ActionBarActivity {
                 Thread th = new Thread(new Runnable() {
                     @Override
                     public void run() {
-
-                        XMPPTCPConnection con = getConnection(usr,pwd);
+                        Global.connection = getConnection(usr,pwd);
                         try {
-                            con.connect();
+                            Global.connection.connect();
+                            Global.connection.login();
                         } catch (SmackException e) {
                             e.printStackTrace();
+//                            showToast();
                         } catch (IOException e) {
                             e.printStackTrace();
+//                            showToast();
                         } catch (XMPPException e) {
                             e.printStackTrace();
+//                            showToast();
                         }
 
-                        System.out.println(con.isConnected());
+                        if (Global.connection.isAuthenticated()) {
+                            Intent intent = new Intent("android.intent.action.USERLIST");
+                            startActivity(intent);
+                        }else {
+                            showToast();
+                        }
+
+                        System.out.println(Global.connection.isAuthenticated());
                     }
+
+                  private void showToast(){
+                      Context context = getApplicationContext();
+                      CharSequence text = "Invalid Credentials!";
+                      int duration = Toast.LENGTH_SHORT;
+
+                      Toast toast = Toast.makeText(context, text, duration);
+                      toast.show();
+                  }
                 });
                 th.start();
 
