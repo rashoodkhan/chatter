@@ -24,7 +24,6 @@ public class UserListActivity extends ActionBarActivity {
 
         TextView tv = (TextView) this.findViewById(R.id.txtMessageView);
 
-
     }
 
 
