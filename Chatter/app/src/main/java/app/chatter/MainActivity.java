@@ -39,40 +39,11 @@ public class MainActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Username - "+username.getText()+" Password - "+password.getText());
+                Log.showLog("Username - "+username.getText()+" Password - "+password.getText());
                 final String usr = username.getText().toString();
                 final String pwd = password.getText().toString();
 
-                Thread th = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Global.connection = getConnection(usr,pwd);
-                        try {
-                            Global.connection.connect();
-                            Global.connection.login();
-                        } catch (SmackException e) {
-                            e.printStackTrace();
-//                            showToast();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-//                            showToast();
-                        } catch (XMPPException e) {
-                            e.printStackTrace();
-//                            showToast();
-                        }
-
-                        if (Global.connection.isAuthenticated()) {
-                            Intent intent = new Intent("android.intent.action.USERLIST");
-                            startActivity(intent);
-                        }else {
-                            showToast();
-                        }
-
-                        System.out.println(Global.connection.isAuthenticated());
-                    }
-                });
-                //th.start();
-                new ConnectionTask().execute(usr,pwd);
+                new ConnectionTask(usr,pwd).execute(usr,pwd);
 
             }
         });
@@ -123,18 +94,35 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private class ConnectionTask extends AsyncTask< String, Void, Void > {
-        protected Void doInBackground(String... userDetails) {
-            int count = userDetails.length;
-            String usr=userDetails[0];
-            String pwd=userDetails[1];
 
-            Global.connection = getConnection(usr,pwd);
+        private String usr;
+        private  String pwd;
 
-            return null;
+        ConnectionTask(String usr, String pwd)
+        {
+            this.usr=usr;
+            this.pwd=pwd;
         }
 
-        protected void onPostExecute() {
+        @Override
+        protected Void doInBackground(String... param) {
 
+            Global.connection = getConnection(usr,pwd);
+            Log.showLog("usr:"+usr+" pwd:"+pwd+" doInBackground() exiting");
+
+            try {
+                Global.connection.connect();
+                Global.connection.login();
+            } catch (SmackException e) {
+                e.printStackTrace();
+                showToast();
+            } catch (IOException e) {
+                e.printStackTrace();
+                showToast();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+                showToast();
+            }
             if (Global.connection.isAuthenticated()) {
                 Intent intent = new Intent("android.intent.action.USERLIST");
                 startActivity(intent);
@@ -143,6 +131,14 @@ public class MainActivity extends ActionBarActivity {
             }
 
             System.out.println(Global.connection.isAuthenticated());
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void param) {
+
+            Log.showLog("onPostExecute()");
         }
     }
 }
