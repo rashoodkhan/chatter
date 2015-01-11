@@ -1,5 +1,6 @@
 package app.chatter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
@@ -80,6 +82,7 @@ public class UserListActivity extends ActionBarActivity {
             if (!createdLocally) chat.addMessageListener(new MyChatMessageListener(parent));
             updateVariables(chat);
             parent.names.add(chat.getParticipant());
+            parent.updateListView();
         }
 
         private void updateVariables(Chat chat) {
@@ -98,7 +101,7 @@ public class UserListActivity extends ActionBarActivity {
         public void processMessage(Chat chat, Message message) {
             String name = chat.getParticipant();
             if (parent.db.get(name) == null)
-                parent.db.put(chat.getParticipant(),new ArrayList<Message>());
+                parent.db.put(chat.getParticipant(), new ArrayList<Message>());
             parent.db.get(name).add(message);
             String msg = name + " --> " + message.getBody();
             System.out.println(msg);
@@ -106,10 +109,15 @@ public class UserListActivity extends ActionBarActivity {
     }
 
     private void updateListView() {
-        namesArrayAdapter =
-                new ArrayAdapter<String>(getApplicationContext(),
-                        R.layout.user_list_item, names);
-        usersListView.setAdapter(namesArrayAdapter);
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                namesArrayAdapter =
+                        new ArrayAdapter<String>(getApplicationContext(),
+                                R.layout.user_list_item, names);
+                usersListView.setAdapter(namesArrayAdapter);
+            }
+        });
     }
 
     @Override
