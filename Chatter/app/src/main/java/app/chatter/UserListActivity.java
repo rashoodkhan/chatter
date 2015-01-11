@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Layout;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -33,6 +36,7 @@ public class UserListActivity extends ActionBarActivity {
     private ArrayList<Chat> chats;
     private Map<String,ArrayList<Message>> db;
     private ListView usersListView;
+    private UserListItemAdapter listItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +49,9 @@ public class UserListActivity extends ActionBarActivity {
 
         TextView tv = (TextView) this.findViewById(R.id.txtMessageView);
         usersListView = (ListView) this.findViewById(R.id.userList);
-        namesArrayAdapter =
-                new ArrayAdapter<String>(getApplicationContext(),
-                        R.layout.user_list_item, names);
-        usersListView.setAdapter(namesArrayAdapter);
+
+        listItemAdapter=new UserListItemAdapter( this );
+        usersListView.setAdapter(listItemAdapter);
 
         usersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -82,7 +85,7 @@ public class UserListActivity extends ActionBarActivity {
             if (!createdLocally) chat.addMessageListener(new MyChatMessageListener(parent));
             updateVariables(chat);
             parent.names.add(chat.getParticipant());
-            parent.updateListView();
+            listItemAdapter.addItem(chat.getParticipant(), new Message());
         }
 
         private void updateVariables(Chat chat) {
@@ -105,17 +108,19 @@ public class UserListActivity extends ActionBarActivity {
             parent.db.get(name).add(message);
             String msg = name + " --> " + message.getBody();
             Log.showLog(msg);
+            parent.updateListView( chat.getParticipant(), message);
         }
     }
 
-    private void updateListView() {
+    private void updateListView( final String name, final Message message) {
         runOnUiThread(new Runnable(){
             @Override
             public void run(){
-                namesArrayAdapter =
+                /*namesArrayAdapter =
                         new ArrayAdapter<String>(getApplicationContext(),
                                 R.layout.user_list_item, names);
-                usersListView.setAdapter(namesArrayAdapter);
+                usersListView.setAdapter(namesArrayAdapter);*/
+                listItemAdapter.updateItem(name, message);
             }
         });
     }
