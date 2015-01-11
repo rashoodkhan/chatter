@@ -94,6 +94,8 @@ public class ChatActivity extends ActionBarActivity {
                 String msg = cursor.getString(1);
                 String timeStamp = cursor.getString(2);
 
+                if(msg.equalsIgnoreCase("null")) continue;
+
                 Message message = new Message();
                 message.setBody(msg);
                 if (uid.equalsIgnoreCase(Global.userid)){
@@ -102,6 +104,8 @@ public class ChatActivity extends ActionBarActivity {
                 else {
                     messageAdapter.addMessage(message,MessageAdapter.DIRECTION_INCOMING);
                 }
+
+
             }
         } catch (Exception e){
             e.printStackTrace();

@@ -34,7 +34,7 @@ public class UserListActivity extends ActionBarActivity {
     private ArrayAdapter<String> namesArrayAdapter;
     private ArrayList<String> names;
     private ArrayList<Chat> chats;
-    private Map<String,ArrayList<Message>> db;
+//    private Map<String,ArrayList<Message>> db;
     private ListView usersListView;
     private UserListItemAdapter listItemAdapter;
 
@@ -44,7 +44,7 @@ public class UserListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_user_list);
 
         chats = new ArrayList<>();
-        db = new HashMap<>();
+//        db = new HashMap<>();
         names = new ArrayList<>();
 
         TextView tv = (TextView) this.findViewById(R.id.txtMessageView);
@@ -68,7 +68,7 @@ public class UserListActivity extends ActionBarActivity {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         Global.chat = chats.get(pos);
         Global.recepientid = Global.chat.getParticipant();
-        Global.db = db;
+//        Global.db = db;
         startActivity(intent);
 
     }
@@ -103,11 +103,14 @@ public class UserListActivity extends ActionBarActivity {
         @Override
         public void processMessage(Chat chat, Message message) {
             String name = chat.getParticipant();
-            if (parent.db.get(name) == null)
-                parent.db.put(chat.getParticipant(), new ArrayList<Message>());
-            parent.db.get(name).add(message);
+//            if (parent.db.get(name) == null)
+//                parent.db.put(chat.getParticipant(), new ArrayList<Message>());
+//            parent.db.get(name).add(message);
 
             try {
+                if (message.getBody() == null || message.getBody().equalsIgnoreCase("")
+                        || message.getBody().equalsIgnoreCase("\n")) return;
+
                 Global.database.execSQL("INSERT INTO chat VALUES('" + name + "','" + message.getBody() + "',datetime())");
             } catch (Exception e){
                 e.printStackTrace();
