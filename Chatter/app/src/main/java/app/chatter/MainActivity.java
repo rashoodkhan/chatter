@@ -26,12 +26,16 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.net.ssl.SSLSocketFactory;
 
 
 public class MainActivity extends ActionBarActivity {
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +51,8 @@ public class MainActivity extends ActionBarActivity {
                 final String usr = username.getText().toString();
                 final String pwd = password.getText().toString();
 
-                new ConnectionTask(usr,pwd).execute(usr,pwd);
-                
+                new ConnectionTask("nitbusiness1","business").execute(usr,pwd);
+
             }
         });
     }
@@ -128,21 +132,7 @@ public class MainActivity extends ActionBarActivity {
                 showToast();
             }
             if (Global.connection.isAuthenticated()) {
-                ChatManager cm = ChatManager.getInstanceFor(Global.connection);
-                cm.addChatListener(new ChatManagerListener() {
-                    @Override
-                    public void chatCreated(Chat chat, boolean createdLocally) {
-                        if(!createdLocally) chat.addMessageListener(new ChatMessageListener() {
-                            @Override
-                            public void processMessage(Chat chat, Message message) {
-                                String name = chat.getParticipant();
-                                String msg = name+" --> "+message.getBody();
-                                System.out.println(msg);
-
-                            }
-                        });
-                    }
-                });
+                Global.userid = Global.connection.getUser();
                 Intent intent = new Intent("android.intent.action.USERLIST");
                 startActivity(intent);
             }else {
