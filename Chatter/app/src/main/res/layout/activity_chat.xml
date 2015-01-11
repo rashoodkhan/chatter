@@ -50,6 +50,8 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_margin="4dp"
+            android:background="@color/BrightYellow"
+            android:textColor="#ffffff"
             android:text="Send" />
 
     </RelativeLayout>

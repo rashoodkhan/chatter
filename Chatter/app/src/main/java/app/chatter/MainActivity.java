@@ -2,6 +2,7 @@ package app.chatter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -36,10 +37,22 @@ import javax.net.ssl.SSLSocketFactory;
 public class MainActivity extends ActionBarActivity {
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Global.database = openOrCreateDatabase("Chatter",MODE_WORLD_WRITEABLE,null);
+
+        if(!tableExists("chat")){
+            Global.database.execSQL("create table chat (userid VARCHAR(50)," +
+                    "message VARCHAR(500)," +
+                    "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
+        }
+
+
 
         Button button = (Button)this.findViewById(R.id.buttonLogin);
         final EditText username = (EditText)this.findViewById(R.id.txtUsername);
@@ -55,6 +68,18 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+    }
+
+    private boolean tableExists(String tblName) {
+        Cursor cursor = Global.database.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tblName+"'", null);
+        if(cursor!=null) {
+            if(cursor.getCount()>0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
     }
 
     private void showToast(){

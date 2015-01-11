@@ -1,6 +1,7 @@
 package app.chatter;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -37,7 +38,7 @@ public class ChatActivity extends ActionBarActivity {
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
-        //populateMessageHistory();
+        populateMessageHistory();
 
         messageBodyField = (EditText) findViewById(R.id.messageBodyField);
 
@@ -72,13 +73,39 @@ public class ChatActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
+        try {
+            Global.database.execSQL("INSERT INTO chat VALUES( '" + Global.userid + "','" + messageBody + "',datetime())");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         messageBodyField.setText("");
         messageAdapter.addMessage(msg,MessageAdapter.DIRECTION_OUTGOING);
     }
 
     //TODO: Implement
     private void populateMessageHistory() {
+        try {
+            Cursor cursor = Global.database.rawQuery("SELECT * FROM chat WHERE userid = '"
+                    +Global.userid+"' OR userid = '"+Global.recepientid+
+                    "' ORDER BY timestamp ASC;",null);
+            while(cursor.moveToNext()) {
+                String uid = cursor.getString(0);
+                String msg = cursor.getString(1);
+                String timeStamp = cursor.getString(2);
 
+                Message message = new Message();
+                message.setBody(msg);
+                if (uid.equalsIgnoreCase(Global.userid)){
+                    messageAdapter.addMessage(message,MessageAdapter.DIRECTION_OUTGOING);
+                }
+                else {
+                    messageAdapter.addMessage(message,MessageAdapter.DIRECTION_INCOMING);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

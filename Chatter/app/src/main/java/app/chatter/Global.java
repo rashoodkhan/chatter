@@ -1,5 +1,7 @@
 package app.chatter;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -17,4 +19,5 @@ public class Global {
     public static String recepientid = null;
     public static Chat chat = null;
     public static Map<String,ArrayList<Message>> db;
+    public static SQLiteDatabase database;
 }

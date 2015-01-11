@@ -106,6 +106,13 @@ public class UserListActivity extends ActionBarActivity {
             if (parent.db.get(name) == null)
                 parent.db.put(chat.getParticipant(), new ArrayList<Message>());
             parent.db.get(name).add(message);
+
+            try {
+                Global.database.execSQL("INSERT INTO chat VALUES('" + name + "','" + message.getBody() + "',datetime())");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
             String msg = name + " --> " + message.getBody();
             Log.showLog(msg);
             parent.updateListView( chat.getParticipant(), message);
