@@ -59,9 +59,11 @@ public class ChatActivity extends ActionBarActivity {
 
     private void sendMessage() {
         messageBody = messageBodyField.getText().toString();
+
         if (messageBody.isEmpty()) {
             return;
         }
+
         Message msg = new Message();
         msg.setBody(messageBody);
         try {

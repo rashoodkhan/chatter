@@ -104,7 +104,7 @@ public class UserListActivity extends ActionBarActivity {
                 parent.db.put(chat.getParticipant(), new ArrayList<Message>());
             parent.db.get(name).add(message);
             String msg = name + " --> " + message.getBody();
-            System.out.println(msg);
+            Log.showLog(msg);
         }
     }
 

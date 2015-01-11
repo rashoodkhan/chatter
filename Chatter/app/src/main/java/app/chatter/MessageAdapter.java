@@ -34,31 +34,29 @@ public class MessageAdapter extends BaseAdapter{
         notifyDataSetChanged();
     }
 
-
-
     @Override
     public int getCount() {
-        return 1;
+        return messages.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return 1;
+        return messages.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return 1;
+        return i;
     }
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
 
     @Override
     public int getItemViewType(int i) {
-        return 1;
+        return messages.get(i).second;
     }
 
     @Override
@@ -77,10 +75,10 @@ public class MessageAdapter extends BaseAdapter{
             convertView = layoutInflater.inflate(res, viewGroup, false);
         }
 
-//        Message message = messages.get(i).
+        Message message = messages.get(i).first;
 
         TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
-//        txtMessage.setText(message.getBody());
+        txtMessage.setText(message.getBody());
 
         return convertView;
 
